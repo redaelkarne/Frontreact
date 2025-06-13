@@ -1,0 +1,84 @@
+.login-root {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  background: #faf9f7;
+  font-family: 'Inter', sans-serif;
+  color: #2c2c2c;
+  width: 100%; /* Assurez-vous que la largeur occupe tout l'écran */
+  box-sizing: border-box;
+  margin: 0;
+}
+
+.login-container {
+  background: #fff;
+  padding: 2rem;
+  border-radius: 12px;
+  box-shadow: 0 4px 24px rgba(44, 44, 44, 0.1);
+  max-width: 400px; /* Limite la largeur maximale */
+  width: 100%; /* Permet au conteneur de s'adapter à l'écran */
+  text-align: center;
+}
+
+.login-container h1 {
+  font-size: 1.8rem;
+  margin-bottom: 1rem;
+  color: #d4a574;
+}
+
+.login-field {
+  margin-bottom: 1rem;
+  text-align: left;
+}
+
+.login-field label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+}
+
+.login-field input {
+  width: 100%;
+  padding: 0.8rem;
+  border: 1.5px solid #ffd3e3;
+  border-radius: 8px;
+  font-size: 1rem;
+  box-sizing: border-box;
+}
+
+.login-btn {
+  background: linear-gradient(90deg, #ff6b9d 0%, #d4a574 100%);
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 0.8rem 1.5rem;
+  font-size: 1rem;
+  font-weight: 600;
+  cursor: pointer;
+  width: 100%;
+  margin-top: 1rem;
+}
+
+.login-btn:hover {
+  background: linear-gradient(90deg, #d4a574 0%, #ff6b9d 100%);
+}
+
+.login-error {
+  color: #ff6b9d;
+  font-size: 0.9rem;
+  margin-bottom: 1rem;
+}
+
+.login-toggle {
+  margin-top: 1rem;
+  font-size: 0.9rem;
+}
+
+.login-toggle button {
+  background: none;
+  border: none;
+  color: #d4a574;
+  font-weight: 600;
+  cursor: pointer;
+}
