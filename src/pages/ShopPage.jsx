@@ -93,15 +93,21 @@ export default function ShopPage() {
   const [search, setSearch] = useState("");
   const [selectedCategories, setSelectedCategories] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false); // État pour la fenêtre modale du panier
-  const [isPaymentOpen, setIsPaymentOpen] = useState(false); // État pour la fenêtre modale de paiement
+  const [isPaymentOpen, setIsPaymentOpen] = useState(false);
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [isGuestModalOpen, setIsGuestModalOpen] = useState(false); // État pour la fenêtre modale de paiement
   const [deliveryInfo, setDeliveryInfo] = useState({
     name: "",
     address: "",
     phone: "",
+    email: "",
   });
   const navigate = useNavigate();
 
   useEffect(() => {
+    const jwt = localStorage.getItem('jwt');
+    setIsLoggedIn(!!jwt);
+
     const loadProducts = async () => {
       const fetchedProducts = await fetchProducts();
       setProducts(fetchedProducts);
@@ -171,15 +177,18 @@ export default function ShopPage() {
   };
 
   function handleCheckout() {
-    if (!deliveryInfo.name || !deliveryInfo.address || !deliveryInfo.phone) {
-      alert("Veuillez remplir toutes les informations de livraison.");
-      return;
-    }
+    if (!deliveryInfo.name || !deliveryInfo.address || !deliveryInfo.phone || (!isLoggedIn && !deliveryInfo.email)) {
+  alert("Veuillez remplir toutes les informations de livraison" + (!isLoggedIn ? " et votre adresse e-mail." : "."));
+  return;
+}
+
+
 
     const orderData = {
       name: deliveryInfo.name,
       address: deliveryInfo.address,
       phone: deliveryInfo.phone,
+      email: deliveryInfo.email,
       items: cart.map((item) => ({
         productId: item.id,
         name: item.name,
@@ -214,6 +223,7 @@ export default function ShopPage() {
       selectedCategories.length === 0 || selectedCategories.includes(p.categorie);
     return matchSearch && matchCategory;
   });
+
 
   return (
     <div className="shop-root">
@@ -300,9 +310,20 @@ export default function ShopPage() {
         </section>
 
         {/* Bouton pour ouvrir le panier */}
-        <button className="shop-cart-btn" onClick={() => setIsCartOpen(true)}>
+        <button
+          className="shop-cart-btn"
+          onClick={() => {
+            const jwt = localStorage.getItem('jwt');
+            if (jwt) {
+              setIsCartOpen(true);
+            } else {
+              setIsGuestModalOpen(true);
+            }
+          }}
+        >
           Voir le panier
         </button>
+
 
         {/* Fenêtre modale pour le panier */}
         {isCartOpen && (
@@ -376,6 +397,16 @@ export default function ShopPage() {
                     value={deliveryInfo.phone}
                     onChange={handleDeliveryChange}
                   />
+                  {!isLoggedIn && (
+                  <input
+                    type="email"
+                    name="email"
+                    placeholder="Adresse e-mail"
+                    value={deliveryInfo.email}
+                    onChange={handleDeliveryChange}
+                  />
+                 )}
+
                   <button className="shop-checkout-btn" onClick={handleCheckout}>
                     Passer au paiement
                   </button>
@@ -403,6 +434,37 @@ export default function ShopPage() {
             </div>
           </div>
         )}
+        {isGuestModalOpen && (
+  <div className="shop-cart-modal">
+    <div className="shop-cart-modal-content">
+      <button
+        className="shop-cart-close-btn"
+        onClick={() => setIsGuestModalOpen(false)}
+      >
+        ✖
+      </button>
+      <h2>Connexion requise</h2>
+      <p>Veuillez vous connecter ou continuer comme invité pour accéder à votre panier.</p>
+      <div style={{ display: "flex", gap: "1rem", marginTop: "1rem" }}>
+        <button
+          className="shop-checkout-btn"
+          onClick={() => navigate('/login')}
+        >
+          Se connecter
+        </button>
+        <button
+          className="shop-checkout-btn"
+          onClick={() => {
+            setIsGuestModalOpen(false);
+            setIsCartOpen(true);
+          }}
+        >
+          Continuer comme invité
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       </main>
       {/* Footer */}
       <footer className="landing-footer">

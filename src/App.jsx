@@ -3,6 +3,7 @@ import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'reac
 import LandingPage from './pages/LandingPage';
 import AdminPage from './pages/AdminPage';
 import ShopPage from './pages/ShopPage';
+import BlogPage from './pages/BlogPage'; // Import du composant BlogPage
 import LoginPage from './pages/LoginPage';
 import ErrorBoundary from './components/ErrorBoundary'; // Import du composant ErrorBoundary
 import Navbar from './components/Navbar'; // Import du composant Navbar
@@ -105,6 +106,7 @@ export default function App() {
         <Routes>
           <Route path="/" element={<LandingPage />} />
           <Route path="/shop" element={<ShopPage />} />
+          <Route path="/blog" element={<BlogPage />} /> {/* Route pour la page de blog */}
           <Route path="/login" element={<LoginPage />} />
           <Route
             path="/admin"
