@@ -238,6 +238,36 @@
   animation: fadeInOut 2s ease-in-out;
 }
 
+.admin-tabs {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 32px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.admin-tab {
+  background: none;
+  border: none;
+  padding: 12px 24px;
+  font-size: 1rem;
+  font-weight: 500;
+  color: #666;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.3s ease;
+}
+
+.admin-tab:hover {
+  color: #d4a574;
+  background: #faf9f7;
+}
+
+.admin-tab.active {
+  color: #d4a574;
+  border-bottom-color: #d4a574;
+  font-weight: 600;
+}
+
 @keyframes fadeInOut {
   0% {
     opacity: 0;

@@ -1,38 +1,55 @@
 .blog-page {
+  width: 100%;
+  min-height: 100vh;
+  background: #faf9f7;
+  font-family: 'Inter', sans-serif;
+  color: #2c2c2c;
   padding: 40px 20px;
-  max-width: 1200px;
-  margin: 0 auto;
+  box-sizing: border-box;
 }
 
 .blog-header-title {
   text-align: center;
-  font-size: 3em;
-  color: #333;
+  font-size: 2.3rem;
+  font-weight: 700;
+  letter-spacing: 1px;
+  color: #222;
   margin-bottom: 10px;
 }
 
 .blog-header-subtitle {
   text-align: center;
-  font-size: 1.2em;
+  font-size: 1.1rem;
   color: #666;
   margin-bottom: 60px;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .blog-posts-container {
   display: flex;
   flex-direction: column;
-  gap: 60px;
+  gap: 40px;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .blog-post {
   display: flex;
   align-items: center;
   gap: 40px;
-  background-color: #fff;
-  border-radius: 8px;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+  background: #fff;
+  border-radius: 16px;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
   overflow: hidden;
-  padding: 20px;
+  padding: 24px;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.blog-post:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.15);
 }
 
 .blog-post.reverse {
@@ -45,77 +62,384 @@
 }
 
 .blog-post-category {
-  background-color: #333;
+  background: linear-gradient(90deg, #ff6b9d 0%, #d4a574 100%);
   color: white;
-  padding: 5px 10px;
-  border-radius: 5px;
-  font-size: 0.8em;
-  font-weight: bold;
+  padding: 6px 12px;
+  border-radius: 8px;
+  font-size: 0.8rem;
+  font-weight: 600;
   text-transform: uppercase;
-  margin-bottom: 10px;
+  margin-bottom: 12px;
   display: inline-block;
+  letter-spacing: 0.5px;
 }
 
 .blog-post-content h2 {
-  font-size: 2em;
-  color: #333;
-  margin-top: 10px;
-  margin-bottom: 10px;
+  font-size: 1.8rem;
+  font-weight: 700;
+  color: #222;
+  margin: 12px 0;
+  line-height: 1.3;
 }
 
 .blog-post-meta {
-  font-size: 0.9em;
-  color: #999;
-  margin-bottom: 15px;
+  font-size: 0.9rem;
+  color: #666;
+  margin-bottom: 16px;
+  font-weight: 500;
 }
 
 .blog-post-content p {
-  font-size: 1em;
-  color: #555;
-  line-height: 1.6;
+  font-size: 1rem;
+  color: #444;
+  line-height: 1.7;
   margin-bottom: 20px;
 }
 
 .read-more-link {
-  color: #d4a574;
+  color: #ff6b9d;
   text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s ease;
+  font-weight: 600;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+  border-bottom: 2px solid transparent;
 }
 
 .read-more-link:hover {
-  color: #a07a51;
+  color: #d4597a;
+  border-bottom: 2px solid #ff6b9d;
 }
 
 .blog-post-image-container {
   flex: 1;
-  max-width: 50%; /* Pour laisser de l'espace au texte */
+  max-width: 50%;
   display: flex;
   justify-content: center;
   align-items: center;
   overflow: hidden;
-  border-radius: 8px;
+  border-radius: 12px;
+  background: #f8f6f3;
 }
 
 .blog-post-image-container img {
   width: 100%;
-  height: 300px; /* Hauteur fixe pour les images de blog */
+  height: 300px;
   object-fit: cover;
   display: block;
+  transition: transform 0.3s ease;
 }
 
+.blog-post:hover .blog-post-image-container img {
+  transform: scale(1.05);
+}
+
+/* Styles pour le modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+  padding: 20px;
+  animation: fadeIn 0.3s ease-in-out;
+}
+
+.modal-content {
+  background: #fff;
+  border-radius: 16px;
+  max-width: 900px;
+  width: 100%;
+  max-height: 90vh;
+  overflow-y: auto;
+  position: relative;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+  animation: slideUp 0.3s ease-out;
+}
+
+.modal-close {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+  background: #ff6b9d;
+  color: white;
+  border: none;
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  font-size: 24px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.3s ease;
+  z-index: 1001;
+  box-shadow: 0 4px 12px rgba(255, 107, 157, 0.3);
+}
+
+.modal-close:hover {
+  background: #d4597a;
+  transform: scale(1.1);
+}
+
+.modal-header {
+  padding: 40px 40px 24px 40px;
+  border-bottom: 1px solid #f0f0f0;
+  background: #faf9f7;
+}
+
+.modal-header .blog-post-category {
+  background: linear-gradient(90deg, #ff6b9d 0%, #d4a574 100%);
+  color: white;
+  padding: 8px 16px;
+  border-radius: 8px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+  display: inline-block;
+  letter-spacing: 0.5px;
+}
+
+.modal-header h1 {
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #222;
+  margin: 15px 0 20px 0;
+  line-height: 1.3;
+}
+
+.modal-header .blog-post-meta {
+  font-size: 1rem;
+  color: #666;
+  font-weight: 500;
+  margin-bottom: 0;
+}
+
+.modal-image {
+  width: 100%;
+  height: 400px;
+  object-fit: cover;
+  display: block;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.modal-body {
+  padding: 32px 40px 40px 40px;
+  background: #fff;
+}
+
+.modal-description {
+  font-size: 1.2rem;
+  line-height: 1.8;
+  color: #444;
+  margin-bottom: 32px;
+  padding: 24px;
+  background: #faf9f7;
+  border-radius: 12px;
+  border-left: 4px solid #ff6b9d;
+  font-weight: 500;
+}
+
+.modal-content-divider {
+  height: 1px;
+  background: linear-gradient(90deg, #ff6b9d 0%, #d4a574 100%);
+  margin: 32px 0;
+  border-radius: 1px;
+}
+
+.modal-body p {
+  font-size: 1.1rem;
+  line-height: 1.8;
+  color: #2c2c2c;
+  margin-bottom: 24px;
+}
+
+.modal-body h2,
+.modal-body h3,
+.modal-body h4 {
+  margin: 32px 0 16px 0;
+  color: #222;
+  font-weight: 700;
+}
+
+.modal-body h2 {
+  font-size: 1.8rem;
+  color: #ff6b9d;
+}
+
+.modal-body h3 {
+  font-size: 1.5rem;
+  color: #d4a574;
+}
+
+.modal-body h4 {
+  font-size: 1.3rem;
+  color: #666;
+}
+
+.modal-body ul,
+.modal-body ol {
+  margin: 24px 0;
+  padding-left: 32px;
+}
+
+.modal-body li {
+  margin-bottom: 12px;
+  line-height: 1.7;
+  color: #2c2c2c;
+}
+
+.modal-body blockquote {
+  border-left: 4px solid #ff6b9d;
+  background: #faf9f7;
+  padding: 20px 24px;
+  margin: 32px 0;
+  font-style: italic;
+  color: #666;
+  border-radius: 8px;
+  font-size: 1.1rem;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* Media Queries - Mobile First Approach */
 @media (max-width: 768px) {
+  .blog-page {
+    padding: 20px 16px;
+  }
+  
+  .blog-header-title {
+    font-size: 1.8rem;
+  }
+  
+  .blog-header-subtitle {
+    font-size: 1rem;
+    margin-bottom: 40px;
+  }
+  
+  .blog-posts-container {
+    gap: 24px;
+  }
+  
   .blog-post {
     flex-direction: column;
+    padding: 20px;
+    gap: 20px;
   }
+  
   .blog-post.reverse {
     flex-direction: column;
   }
+  
   .blog-post-content {
-    padding: 10px;
-    text-align: center;
+    padding: 16px;
+    text-align: left;
   }
+  
+  .blog-post-content h2 {
+    font-size: 1.5rem;
+  }
+  
   .blog-post-image-container {
     max-width: 100%;
+    height: 200px;
   }
-} 
+  
+  .blog-post-image-container img {
+    height: 200px;
+  }
+  
+  .modal-overlay {
+    padding: 16px;
+  }
+  
+  .modal-header {
+    padding: 24px 20px 20px 20px;
+  }
+  
+  .modal-header h1 {
+    font-size: 1.8rem;
+  }
+  
+  .modal-body {
+    padding: 20px;
+  }
+  
+  .modal-description {
+    font-size: 1.1rem;
+    padding: 20px;
+    margin-bottom: 24px;
+  }
+  
+  .modal-close {
+    top: 16px;
+    right: 16px;
+    width: 40px;
+    height: 40px;
+    font-size: 20px;
+  }
+  
+  .modal-image {
+    height: 250px;
+  }
+}
+
+@media (min-width: 769px) and (max-width: 1024px) {
+  .blog-page {
+    padding: 32px 24px;
+  }
+  
+  .blog-header-title {
+    font-size: 2.1rem;
+  }
+  
+  .blog-posts-container {
+    gap: 32px;
+  }
+  
+  .blog-post {
+    gap: 32px;
+  }
+  
+  .blog-post-content h2 {
+    font-size: 1.6rem;
+  }
+}
+
+@media (min-width: 1025px) {
+  .blog-page {
+    padding: 48px 32px;
+  }
+  
+  .blog-header-title {
+    font-size: 2.5rem;
+  }
+  
+  .blog-header-subtitle {
+    font-size: 1.2rem;
+  }
+}

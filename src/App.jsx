@@ -7,6 +7,7 @@ import BlogPage from './pages/BlogPage'; // Import du composant BlogPage
 import LoginPage from './pages/LoginPage';
 import ErrorBoundary from './components/ErrorBoundary'; // Import du composant ErrorBoundary
 import Navbar from './components/Navbar'; // Import du composant Navbar
+import CreationsPage from './pages/CreationsPage'; // Import corrigé du composant CreationsPage
 
 // Fonction pour récupérer les informations utilisateur depuis l'API avec le rôle
 const fetchUserRole = async () => {
@@ -108,6 +109,7 @@ export default function App() {
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/blog" element={<BlogPage />} /> {/* Route pour la page de blog */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/creations" element={<CreationsPage />} /> {/* Route corrigée pour la page Créations */}
           <Route
             path="/admin"
             element={
