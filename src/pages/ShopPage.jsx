@@ -34,7 +34,7 @@ const fetchProducts = async () => {
   }
 };
 
-export default function ShopPage() {
+const ShopPage = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(() => {
     const savedCart = localStorage.getItem("cart");
@@ -54,11 +54,17 @@ export default function ShopPage() {
     email: "",
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
+  const [userEmail, setUserEmail] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
     const jwt = localStorage.getItem('jwt');
     setIsLoggedIn(!!jwt);
+
+    // Récupérer l'email de l'utilisateur connecté
+    if (jwt) {
+      fetchUserEmail();
+    }
 
     const loadProducts = async () => {
       const fetchedProducts = await fetchProducts();
@@ -66,6 +72,31 @@ export default function ShopPage() {
     };
     loadProducts();
   }, []);
+
+  const fetchUserEmail = async () => {
+    const jwt = localStorage.getItem('jwt');
+    try {
+      const response = await fetch('http://localhost:1337/api/users/me', {
+        method: 'GET',
+        headers: {
+          Authorization: `Bearer ${jwt}`,
+          'Content-Type': 'application/json',
+        },
+      });
+
+      if (response.ok) {
+        const userData = await response.json();
+        setUserEmail(userData.email || '');
+        // Pré-remplir l'email dans deliveryInfo
+        setDeliveryInfo(prev => ({
+          ...prev,
+          email: userData.email || ''
+        }));
+      }
+    } catch (err) {
+      console.error('Erreur lors de la récupération de l\'email utilisateur:', err);
+    }
+  };
 
   useEffect(() => {
     localStorage.setItem("cart", JSON.stringify(cart));
@@ -132,6 +163,7 @@ export default function ShopPage() {
       name: deliveryInfo.name.trim(),
       address: deliveryInfo.address.trim(),
       phone: deliveryInfo.phone.trim(),
+      email: isLoggedIn ? userEmail : deliveryInfo.email.trim(), // Utiliser l'email de l'utilisateur connecté
       items: cart.map((item) => ({
         productId: item.id,
         name: item.name,
@@ -140,10 +172,6 @@ export default function ShopPage() {
       })),
       total: parseFloat(cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2))
     };
-
-    if (!isLoggedIn && deliveryInfo.email) {
-      orderData.email = deliveryInfo.email.trim();
-    }
 
     sendOrderToStrapi(orderData).then((result) => {
       if (result) {
@@ -517,14 +545,23 @@ export default function ShopPage() {
                       value={deliveryInfo.phone}
                       onChange={handleDeliveryChange}
                     />
-                    {!isLoggedIn && (
-                      <input
-                        type="email"
-                        name="email"
-                        placeholder="Adresse e-mail"
-                        value={deliveryInfo.email}
-                        onChange={handleDeliveryChange}
-                      />
+                    <input
+                      type="email"
+                      name="email"
+                      placeholder="Adresse e-mail"
+                      value={isLoggedIn ? userEmail : deliveryInfo.email}
+                      onChange={isLoggedIn ? () => {} : handleDeliveryChange}
+                      disabled={isLoggedIn}
+                      style={{
+                        backgroundColor: isLoggedIn ? '#f5f5f5' : 'white',
+                        color: isLoggedIn ? '#666' : 'black',
+                        cursor: isLoggedIn ? 'not-allowed' : 'text'
+                      }}
+                    />
+                    {isLoggedIn && (
+                      <small style={{ color: '#666', fontSize: '0.9rem', marginTop: '-8px', display: 'block' }}>
+                        Email automatiquement rempli car vous êtes connecté
+                      </small>
                     )}
                     <button className="shop-checkout-btn" onClick={handleCheckout}>
                       Passer au paiement
@@ -622,3 +659,5 @@ export default function ShopPage() {
     </div>
   );
 }
+
+export default ShopPage;

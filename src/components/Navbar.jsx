@@ -70,6 +70,18 @@ export default function Navbar() {
 
   const isActive = (path) => location.pathname === path;
 
+  const handleProfileClick = () => {
+    navigate('/profile');
+    setShowLogoutMenu(false);
+    closeMobileMenu();
+  };
+
+  const handleOrdersClick = () => {
+    navigate('/orders');
+    setShowLogoutMenu(false);
+    closeMobileMenu();
+  };
+
   return (
     <nav className={`modern-navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className="navbar-container">
@@ -142,10 +154,10 @@ export default function Navbar() {
               
               {showLogoutMenu && (
                 <div className="user-dropdown">
-                  <button className="dropdown-item">
+                  <button className="dropdown-item" onClick={handleProfileClick}>
                     👤 Mon Profil
                   </button>
-                  <button className="dropdown-item">
+                  <button className="dropdown-item" onClick={handleOrdersClick}>
                     📦 Mes Commandes
                   </button>
                   <div className="dropdown-divider"></div>

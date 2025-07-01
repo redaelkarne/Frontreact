@@ -5,6 +5,8 @@ import AdminPage from './pages/AdminPage';
 import ShopPage from './pages/ShopPage';
 import BlogPage from './pages/BlogPage'; // Import du composant BlogPage
 import LoginPage from './pages/LoginPage';
+import ProfilePage from './pages/ProfilePage'; // Import du composant ProfilePage
+import OrdersPage from './pages/OrdersPage'; // Import du composant OrdersPage
 import ErrorBoundary from './components/ErrorBoundary'; // Import du composant ErrorBoundary
 import Navbar from './components/Navbar'; // Import du composant Navbar
 import Footer from './components/Footer'; // Import du composant Footer
@@ -125,6 +127,8 @@ export default function App() {
           <Route path="/login" element={<LoginPage />} />
           <Route path="/creations" element={<CreationsPage />} /> {/* Route corrigée pour la page Créations */}
           <Route path="/contact" element={<Contact />} /> {/* Route pour la page Contact */}
+          <Route path="/profile" element={<ProfilePage />} /> {/* Route pour la page Profil */}
+          <Route path="/orders" element={<OrdersPage />} /> {/* Route pour la page Commandes */}
           <Route
             path="/admin"
             element={
