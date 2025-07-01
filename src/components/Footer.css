@@ -1,0 +1,153 @@
+.global-footer {
+  background: #2c2c2c;
+  color: #fff;
+  text-align: center;
+  padding: 32px 20px;
+  margin-top: 40px;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.footer-top {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  max-width: 1200px;
+  margin: 0 auto;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+
+.footer-help,
+.footer-links {
+  flex: 1;
+  min-width: 200px;
+}
+
+.footer-help h3,
+.footer-links h3 {
+  color: #ff6b9d;
+  font-size: 1.1rem;
+  font-weight: 600;
+  margin-bottom: 16px;
+  text-align: left;
+}
+
+.footer-help ul,
+.footer-links ul {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  text-align: left;
+}
+
+.footer-help li,
+.footer-links li {
+  margin-bottom: 8px;
+  color: #ccc;
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+.footer-help li:hover,
+.footer-links li:hover {
+  color: #ff6b9d;
+}
+
+.footer-logo {
+  flex: 2;
+  max-width: 400px;
+  text-align: center;
+}
+
+.footer-logo p {
+  color: #ccc;
+  line-height: 1.6;
+  margin: 16px 0;
+  font-size: 0.95rem;
+}
+
+.footer-socials {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  margin-top: 20px;
+}
+
+.footer-social-icon {
+  background: #ff6b9d;
+  color: #fff;
+  padding: 8px 12px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.footer-social-icon:hover {
+  background: #d4a574;
+}
+
+.footer-bottom {
+  border-top: 1px solid #444;
+  margin-top: 32px;
+  padding-top: 20px;
+  color: #999;
+  font-size: 0.9rem;
+  max-width: 1200px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.footer-bottom a {
+  color: #ff6b9d;
+  text-decoration: none;
+  transition: color 0.2s;
+}
+
+.footer-bottom a:hover {
+  color: #d4a574;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .footer-top {
+    flex-direction: column;
+    text-align: center;
+    gap: 24px;
+  }
+
+  .footer-help,
+  .footer-links {
+    min-width: auto;
+  }
+
+  .footer-help h3,
+  .footer-links h3,
+  .footer-help ul,
+  .footer-links ul {
+    text-align: center;
+  }
+
+  .footer-logo {
+    order: -1;
+  }
+
+  .global-footer {
+    padding: 24px 16px;
+    margin-top: 32px;
+  }
+}
+
+@media (max-width: 480px) {
+  .footer-socials {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .footer-social-icon {
+    width: 100px;
+    text-align: center;
+  }
+}

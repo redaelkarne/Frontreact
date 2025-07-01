@@ -618,14 +618,7 @@ export default function ShopPage() {
         )}
       </main>
 
-      <footer className="landing-footer">
-        <div className="landing-footer-container">
-          <p className="landing-footer-links">
-            <a href="#">Mentions légales</a> | <a href="#">CGV</a> | <a href="#">Contact</a>
-          </p>
-          <p>© 2025 Artisan Créations - Fait main avec passion dans les Hautes-Alpes</p>
-        </div>
-      </footer>
+     
     </div>
   );
 }

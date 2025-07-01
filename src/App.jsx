@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import AdminPage from './pages/AdminPage';
@@ -7,7 +7,9 @@ import BlogPage from './pages/BlogPage'; // Import du composant BlogPage
 import LoginPage from './pages/LoginPage';
 import ErrorBoundary from './components/ErrorBoundary'; // Import du composant ErrorBoundary
 import Navbar from './components/Navbar'; // Import du composant Navbar
+import Footer from './components/Footer'; // Import du composant Footer
 import CreationsPage from './pages/CreationsPage'; // Import corrigé du composant CreationsPage
+import Contact from './pages/Contact'; // Import du composant Contact
 
 // Fonction pour récupérer les informations utilisateur depuis l'API avec le rôle
 const fetchUserRole = async () => {
@@ -98,11 +100,23 @@ function ConditionalNavbar() {
   return <Navbar />; // Affiche la Navbar
 }
 
+// Composant pour remonter en haut de page lors du changement de route
+function ScrollToTop() {
+  const { pathname } = useLocation();
+
+  useEffect(() => {
+    window.scrollTo(0, 0);
+  }, [pathname]);
+
+  return null;
+}
+
 // Composant principal
 export default function App() {
   return (
     <ErrorBoundary>
       <Router>
+        <ScrollToTop />
         <ConditionalNavbar /> {/* Affiche la Navbar conditionnellement */}
         <Routes>
           <Route path="/" element={<LandingPage />} />
@@ -110,6 +124,7 @@ export default function App() {
           <Route path="/blog" element={<BlogPage />} /> {/* Route pour la page de blog */}
           <Route path="/login" element={<LoginPage />} />
           <Route path="/creations" element={<CreationsPage />} /> {/* Route corrigée pour la page Créations */}
+          <Route path="/contact" element={<Contact />} /> {/* Route pour la page Contact */}
           <Route
             path="/admin"
             element={
@@ -119,6 +134,7 @@ export default function App() {
             }
           />
         </Routes>
+        <Footer /> {/* Footer global pour toutes les pages */}
       </Router>
     </ErrorBoundary>
   );

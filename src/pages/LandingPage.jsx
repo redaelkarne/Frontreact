@@ -1,8 +1,5 @@
 import React, { useEffect, useState } from "react";
 import "./LandingPage.css";
-import Slider from "react-slick";
-import "slick-carousel/slick/slick.css";
-import "slick-carousel/slick/slick-theme.css";
 import { Link } from "react-router-dom";
 
 const animatedWords = [
@@ -13,34 +10,158 @@ const animatedWords = [
   "sur mesure"
 ];
 
-const categories = [
-  {
-    name: "Bandeaux",
-    img: "https://audelweiss.fr/wp-content/uploads/2025/02/bandeaufantaisie.jpg.webp",
-    link: "/bandeaux"
-  },
-  {
-    name: "Fleurs",
-    img: "https://audelweiss.fr/wp-content/smush-webp/2025/04/Illustration_sans_titre-1.png.webp",
-    link: "/fleurs"
-  },
-  {
-    name: "Porte-clé",
-    img: "https://audelweiss.fr/wp-content/uploads/2025/02/porte-cle.jpg.webp",
-    link: "/porte-cle"
+// Fonction pour récupérer les produits depuis Strapi
+const fetchProducts = async () => {
+  try {
+    const response = await fetch('http://localhost:1337/api/featured-products?populate=img');
+    const data = await response.json();
+
+    if (!Array.isArray(data?.data)) {
+      console.error("Réponse inattendue de Strapi:", data);
+      return [];
+    }
+
+    return data.data.map((item) => {
+      const attributes = item.attributes || {};
+      return {
+        id: item.id,
+        name: attributes.Name || item.Name,
+        price: attributes.price || item.price,
+        originalPrice: attributes.originalPrice || item.originalPrice,
+        promo: attributes.promo || item.promo,
+        img: attributes.img?.data?.attributes?.url
+          ? `http://localhost:1337${attributes.img.data.attributes.url}`
+          : `http://localhost:1337${item.img?.url || ""}`,
+        categorie: attributes.Categorie || item.Categorie || "Autre",
+      };
+    });
+  } catch (err) {
+    console.error("Erreur lors de la récupération des produits:", err);
+    return [];
   }
-];
+};
+
+// Fonction pour récupérer les articles de blog depuis Strapi
+const fetchBlogArticles = async () => {
+  try {
+    const response = await fetch('http://localhost:1337/api/articles?populate=image&sort=createdAt:desc&pagination[limit]=3');
+    const data = await response.json();
+
+    if (!Array.isArray(data?.data)) {
+      console.error("Réponse inattendue de Strapi:", data);
+      return [];
+    }
+
+    return data.data.map((item) => {
+      const attributes = item.attributes || {};
+      return {
+        id: item.id,
+        title: attributes.title || item.title,
+        excerpt: attributes.excerpt || item.excerpt,
+        category: attributes.category || item.category || "Blog",
+        createdAt: attributes.createdAt || item.createdAt,
+        img: attributes.image?.data?.attributes?.url
+          ? `http://localhost:1337${attributes.image.data.attributes.url}`
+          : null,
+      };
+    });
+  } catch (err) {
+    console.error("Erreur lors de la récupération des articles:", err);
+    return [];
+  }
+};
+
+// Fonction pour récupérer les créations depuis Strapi
+const fetchCreations = async () => {
+  try {
+    const response = await fetch('http://localhost:1337/api/creations?populate=img&pagination[limit]=3');
+    const data = await response.json();
+
+    if (!Array.isArray(data?.data)) {
+      return [];
+    }
+
+    return data.data.map((item) => {
+      return {
+        id: item.id,
+        titre: item.Titre || "",
+        descriptions: item.description || "",
+        img: item.img?.url
+          ? `http://localhost:1337${item.img.url}`
+          : null,
+      };
+    });
+  } catch (err) {
+    console.error("Erreur lors de la récupération des créations:", err);
+    return [];
+  }
+};
 
 const LandingPage = () => {
   const [currentWord, setCurrentWord] = useState(0);
   const [hovered, setHovered] = useState(0);
+  const [products, setProducts] = useState([]);
+  const [blogArticles, setBlogArticles] = useState([]);
+  const [creations, setCreations] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  // Catégories avec liens vers la boutique avec filtres
+  const categories = [
+    {
+      name: "Bandeaux",
+      img: creations[0]?.img || "https://audelweiss.fr/wp-content/uploads/2025/02/bandeaufantaisie.jpg.webp",
+      link: "/shop?category=Bandeaux"
+    },
+    {
+      name: "Fleurs",
+      img: creations[1]?.img || "https://audelweiss.fr/wp-content/smush-webp/2025/04/Illustration_sans_titre-1.png.webp",
+      link: "/shop?category=Fleurs"
+    },
+    {
+      name: "Porte-clé",
+      img: creations[2]?.img || "https://audelweiss.fr/wp-content/uploads/2025/02/porte-cle.jpg.webp",
+      link: "/shop?category=Porte-clé"
+    }
+  ];
 
   useEffect(() => {
     const interval = setInterval(() => {
       setCurrentWord((prev) => (prev + 1) % animatedWords.length);
-    }, 1800); // Change toutes les 1.8 secondes
+    }, 1800);
     return () => clearInterval(interval);
   }, []);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      const [fetchedProducts, fetchedArticles, fetchedCreations] = await Promise.all([
+        fetchProducts(),
+        fetchBlogArticles(),
+        fetchCreations()
+      ]);
+      
+      setProducts(fetchedProducts);
+      setBlogArticles(fetchedArticles);
+      setCreations(fetchedCreations);
+      setLoading(false);
+    };
+    
+    loadData();
+  }, []);
+
+  const formatDate = (dateString) => {
+    const date = new Date(dateString);
+    return date.toLocaleDateString('fr-FR', {
+      day: '2-digit',
+      month: '2-digit',
+      year: 'numeric'
+    });
+  };
+
+  const handleNavigation = (path) => {
+    window.scrollTo(0, 0);
+    // La navigation sera gérée par le Link de React Router
+  };
 
   return (
     <div>
@@ -69,7 +190,9 @@ const LandingPage = () => {
           <p>
             Chaque pièce est soigneusement confectionnée à la main dans les Hautes-Alpes. Offre-toi (ou à tes proches) un savoir-faire inspiré de la montagne, alliant douceur et originalité.
           </p>
-          <button className="hero-btn">Découvrir la boutique</button>
+          <Link to="/shop" onClick={() => handleNavigation('/shop')}>
+            <button className="hero-btn">Découvrir la boutique</button>
+          </Link>
         </div>
         <div className="hero-badge-full">
           <span className="et_pb_image_wrap">
@@ -109,42 +232,56 @@ const LandingPage = () => {
         </div>
       </div>
 
-      {/* BANDEAU CATÉGORIES */}
+      {/* BANDEAU CRÉATIONS */}
       <section className="categories-banner">
         <div className="categories-banner-top">
-          <span>• LES CATÉGORIES • • • LES CATÉGORIES • • • LES CATÉGORIES • • • LES CATÉGORIES •</span>
+          <span>• NOS CRÉATIONS • • • NOS CRÉATIONS • • • NOS CRÉATIONS • • • NOS CRÉATIONS •</span>
         </div>
         <div className="categories-banner-content">
           <div className="categories-left">
-            <img
-              src={categories[hovered].img}
-              alt={categories[hovered].name}
-              style={{ width: 340, height: 340, borderRadius: 18, objectFit: "cover", boxShadow: "0 2px 12px #e0d6d0" }}
-            />
+            {creations.length > 0 ? (
+              <img
+                src={creations[hovered]?.img || "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80"}
+                alt={creations[hovered]?.titre || "Création"}
+                style={{ width: 280, height: 280, borderRadius: 18, objectFit: "cover", boxShadow: "0 2px 12px #e0d6d0" }}
+              />
+            ) : (
+              <div style={{ width: 280, height: 280, borderRadius: 18, background: "#f8f6f3", display: "flex", alignItems: "center", justifyContent: "center", boxShadow: "0 2px 12px #e0d6d0" }}>
+                <span style={{ fontSize: "2.5rem", color: "#d4a574" }}>🎨</span>
+              </div>
+            )}
           </div>
           <div className="categories-center">
             <h2>
-              {categories.map((cat, idx) => (
-                <Link
-                  key={cat.name}
-                  to={cat.link}
-                  style={{
-                    display: "block",
-                    color: hovered === idx ? "#f47b9b" : "#3a3937",
-                    fontWeight: hovered === idx ? "bold" : "normal",
-                    textDecoration: "none",
-                    fontSize: "2.2rem",
-                    margin: "10px 0",
-                    transition: "color 0.2s"
-                  }}
-                  onMouseEnter={() => setHovered(idx)}
-                  onMouseLeave={() => setHovered(hovered)}
-                >
-                  {cat.name}
-                </Link>
-              ))}
+              {loading ? (
+                <div style={{ color: "#666", fontSize: "1.1rem" }}>Chargement des créations...</div>
+              ) : creations.length === 0 ? (
+                <div style={{ color: "#666", fontSize: "1.1rem" }}>Aucune création disponible</div>
+              ) : (
+                creations.map((creation, idx) => (
+                  <Link
+                    key={creation.id}
+                    to="/creations"
+                    style={{
+                      display: "block",
+                      color: hovered === idx ? "#f47b9b" : "#3a3937",
+                      fontWeight: hovered === idx ? "bold" : "normal",
+                      textDecoration: "none",
+                      fontSize: "1.8rem",
+                      margin: "8px 0",
+                      transition: "color 0.2s"
+                    }}
+                    onMouseEnter={() => setHovered(idx)}
+                    onMouseLeave={() => setHovered(hovered)}
+                  >
+                    {creation.titre}
+                  </Link>
+                ))
+              )}
             </h2>
-            <button className="boutique-btn">Voir la boutique</button>
+            <Link to="/creations" onClick={() => handleNavigation('/creations')}>
+              <button className="boutique-btn">Voir toutes nos créations</button>
+            </Link>
           </div>
         </div>
       </section>
@@ -158,36 +295,40 @@ const LandingPage = () => {
           Fait main avec <span className="bold">passion</span>, pour toi et ceux que tu aimes ✨
         </p>
         <div className="products-list">
-          <div className="product-card">
-            <div className="promo-label">EN PROMO !</div>
-            <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80" alt="Produit 1" className="product-image" />
-            <button className="product-btn">+ Choix des options</button>
-            <div className="product-rating">★★★★★</div>
-            <div className="product-title">SCRUNCHY | Tricotin•e</div>
-            <div className="product-price">4.00€</div>
-          </div>
-          <div className="product-card">
-            <div className="promo-label">EN PROMO !</div>
-            <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=400&q=80" alt="Produit 2" className="product-image" />
-            <button className="product-btn">+ Choix des options</button>
-            <div className="product-title">Dessous de plat en liège gravé | Hautes-Alpes</div>
-            <div className="product-price">12.00€</div>
-          </div>
-          <div className="product-card">
-            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=400&q=80" alt="Produit 3" className="product-image" />
-            <button className="product-btn">+ Ajouter au panier</button>
-            <div className="product-title">Rose éternelle</div>
-            <div className="product-price">18.00€</div>
-          </div>
-          <div className="product-card">
-            <div className="promo-label">EN PROMO !</div>
-            <img src="https://images.unsplash.com/photo-1454023492550-5696f8ff10e1?auto=format&fit=crop&w=400&q=80" alt="Produit 4" className="product-image" />
-            <button className="product-btn">+ Ajouter au panier</button>
-            <div className="product-title">SOLEA | Pièce unique</div>
-            <div className="product-price">
-              <span className="old-price">75.00€</span> 65.00€
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px', fontSize: '1.2rem', color: '#666' }}>
+              Chargement des produits...
             </div>
-          </div>
+          ) : products.length === 0 ? (
+            <div style={{ textAlign: 'center', padding: '40px', fontSize: '1.2rem', color: '#666' }}>
+              Aucun produit disponible
+            </div>
+          ) : (
+            products.slice(0, 4).map((product) => (
+              <div key={product.id} className="product-card">
+                {product.promo && <div className="promo-label">EN PROMO !</div>}
+                <img 
+                  src={product.img} 
+                  alt={product.name} 
+                  className="product-image"
+                  onError={(e) => {
+                    e.target.src = "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=400&q=80";
+                  }}
+                />
+                <Link to="/shop">
+                  <button className="product-btn">+ Voir en boutique</button>
+                </Link>
+                <div className="product-rating">★★★★★</div>
+                <div className="product-title">{product.name}</div>
+                <div className="product-price">
+                  {product.originalPrice && (
+                    <span className="old-price">{product.originalPrice}€</span>
+                  )}
+                  {product.price}€
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </section>
 
@@ -206,7 +347,9 @@ const LandingPage = () => {
             <p>
               Pour moi, <b>chaque création est une aventure qui allie savoir-faire artisanal, inspiration locale et connexion intérieure.</b> C'est cette approche inspirée de la montagne que je souhaite partager à travers mon univers.
             </p>
-            <button className="about-btn">En savoir plus</button>
+            <Link to="/creations" onClick={() => handleNavigation('/creations')}>
+              <button className="about-btn">En savoir plus</button>
+            </Link>
           </div>
           <div className="about-right">
             <div className="about-img-main">
@@ -225,67 +368,53 @@ const LandingPage = () => {
           DÉCOUVRE LE BLOG <span className="blog-heart">❣️</span>
         </h2>
         <div className="blog-list">
-          <div className="blog-card">
-            <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="Blog 1" />
-            <div className="blog-overlay"></div>
-            <div className="blog-label">Événements</div>
-            <div className="blog-title">Mon tout premier marché artisanal : retour sur l'expérience</div>
-            <div className="blog-date"><span className="blog-date-icon">📅</span> 08/06/2025</div>
-          </div>
-          <div className="blog-card">
-            <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80" alt="Blog 2" />
-            <div className="blog-overlay"></div>
-            <div className="blog-label">Matériel</div>
-            <div className="blog-title">Addi King Size vs Sentro 48 : quelle machine choisir pour tes projets créatifs ?</div>
-            <div className="blog-date"><span className="blog-date-icon">📅</span> 04/04/2025</div>
-          </div>
-          <div className="blog-card">
-            <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Blog 3" />
-            <div className="blog-overlay"></div>
-            <div className="blog-label">Infos</div>
-            <div className="blog-title">Quelle laine choisir ? (Guide Complet 2025)</div>
-            <div className="blog-date"><span className="blog-date-icon">📅</span> 12/03/2025</div>
-          </div>
+          {loading ? (
+            <div style={{ textAlign: 'center', padding: '40px', fontSize: '1.2rem', color: '#666' }}>
+              Chargement des articles...
+            </div>
+          ) : blogArticles.length === 0 ? (
+            // Articles statiques si pas d'articles dans Strapi
+            <>
+              <Link to="/blog" className="blog-card">
+                <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="Blog 1" />
+                <div className="blog-overlay"></div>
+                <div className="blog-label">Événements</div>
+                <div className="blog-title">Mon tout premier marché artisanal : retour sur l'expérience</div>
+                <div className="blog-date"><span className="blog-date-icon">📅</span> 08/06/2025</div>
+              </Link>
+              <Link to="/blog" className="blog-card">
+                <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80" alt="Blog 2" />
+                <div className="blog-overlay"></div>
+                <div className="blog-label">Matériel</div>
+                <div className="blog-title">Addi King Size vs Sentro 48 : quelle machine choisir pour tes projets créatifs ?</div>
+                <div className="blog-date"><span className="blog-date-icon">📅</span> 04/04/2025</div>
+              </Link>
+              <Link to="/blog" className="blog-card">
+                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Blog 3" />
+                <div className="blog-overlay"></div>
+                <div className="blog-label">Infos</div>
+                <div className="blog-title">Quelle laine choisir ? (Guide Complet 2025)</div>
+                <div className="blog-date"><span className="blog-date-icon">📅</span> 12/03/2025</div>
+              </Link>
+            </>
+          ) : (
+            blogArticles.map((article) => (
+              <Link key={article.id} to="/blog" className="blog-card">
+                <img 
+                  src={article.img || "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80"} 
+                  alt={article.title} 
+                />
+                <div className="blog-overlay"></div>
+                <div className="blog-label">{article.category}</div>
+                <div className="blog-title">{article.title}</div>
+                <div className="blog-date">
+                  <span className="blog-date-icon">📅</span> {formatDate(article.createdAt)}
+                </div>
+              </Link>
+            ))
+          )}
         </div>
       </section>
-
-      {/* FOOTER */}
-      <footer className="footer">
-        <div className="footer-top">
-          <div className="footer-help">
-            <h3>Besoin d'aide ?</h3>
-            <ul>
-              <li>Points de vente physiques</li>
-              <li>Livraison</li>
-              <li>Foire aux questions</li>
-              <li>Me contacter</li>
-            </ul>
-          </div>
-          <div className="footer-logo">
-            <img src="https://audelweiss.fr/wp-content/uploads/2025/02/logo-blanc.svg" alt="Logo Audelweiss" style={{ width: '180px', height: 'auto' }} />
-            <p>
-              Chaque pièce est imaginée et réalisée à la main dans les Hautes-Alpes, avec passion et créativité. Un mélange d'authenticité, d'expérimentation et d'énergie positive pour apporter douceur et harmonie à votre quotidien.
-              <br /><br />
-              Retrouvez-moi sur Instagram pour suivre les actus 🐚✨
-            </p>
-            <div className="footer-socials">
-              <span className="footer-social-icon">IG</span>
-              <span className="footer-social-icon">TikTok</span>
-            </div>
-          </div>
-          <div className="footer-links">
-            <h3>Liens utiles</h3>
-            <ul>
-              <li>CGV</li>
-              <li>Mentions légales</li>
-              <li>Politique de confidentialité</li>
-            </ul>
-          </div>
-        </div>
-        <div className="footer-bottom">
-          2025 © AUDELWEISS Craft – Site réalisé par <a href="#">Audrey HOSSEPIAN</a>
-        </div>
-      </footer>
     </div>
   );
 };

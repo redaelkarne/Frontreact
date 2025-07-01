@@ -104,15 +104,19 @@ export default function Navbar() {
             📝 Blog
           </Link>
           <Link 
+            to="/contact" 
+            className={isActive('/contact') ? 'active' : ''}
+            onClick={closeMobileMenu}
+          >
+            📞 Contact
+          </Link>
+          <Link 
             to="/creations" 
             className={isActive('/creations') ? 'active' : ''}
             onClick={closeMobileMenu}
           >
             🎨 Créations
           </Link>
-          <a href="#" onClick={closeMobileMenu}>
-            📞 Contact
-          </a>
           
           {isAdmin && (
             <Link 

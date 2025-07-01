@@ -1013,7 +1013,7 @@
 
 .categories-banner {
   background: #f7e6e1;
-  min-height: 100vh;
+  min-height: 70vh;
   display: flex;
   flex-direction: column;
   justify-content: center;
