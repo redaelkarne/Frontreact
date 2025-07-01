@@ -74,7 +74,7 @@ export default function Navbar() {
     <nav className={`modern-navbar ${isScrolled ? 'scrolled' : ''}`}>
       <div className="navbar-container">
         <Link to="/" className="navbar-logo">
-          ✨ Artisan Créations
+          <img src="https://audelweiss.fr/wp-content/uploads/2025/02/logo-wide.svg" alt="Logo Audelweiss" style={{ width: '170px', height: 'auto', verticalAlign: 'middle' }} />
         </Link>
 
         <button className="mobile-menu-toggle" onClick={toggleMobileMenu}>
