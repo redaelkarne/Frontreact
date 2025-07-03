@@ -2,6 +2,8 @@ import React, { useEffect, useState } from "react";
 import "./ShopPage.css";
 import { useNavigate } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
+import Slider from "rc-slider";
+import "rc-slider/assets/index.css";
 
 // Fonction pour récupérer les produits depuis Strapi
 const fetchProducts = async () => {
@@ -34,6 +36,9 @@ const fetchProducts = async () => {
   }
 };
 
+const PRICE_MIN = 0;
+const PRICE_MAX = 100;
+
 const ShopPage = () => {
   const [products, setProducts] = useState([]);
   const [cart, setCart] = useState(() => {
@@ -55,6 +60,7 @@ const ShopPage = () => {
   });
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [userEmail, setUserEmail] = useState('');
+  const [priceRange, setPriceRange] = useState([PRICE_MIN, PRICE_MAX]);
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -197,6 +203,11 @@ const ShopPage = () => {
       selectedCategories.length === 0 || selectedCategories.includes(p.categorie);
     return matchSearch && matchCategory;
   });
+
+  // Filtrage des produits selon la plage de prix
+  const filteredProductsByPrice = filteredProducts.filter(
+    (p) => p.price >= priceRange[0] && p.price <= priceRange[1]
+  );
 
   const simulatePayment = async (amount) => {
     return new Promise((resolve, reject) => {
@@ -426,15 +437,38 @@ const ShopPage = () => {
               ))}
             </ul>
           </div>
+
+          <h3>Filtrer par prix</h3>
+          <div style={{ margin: "24px 0 12px 0", width: 180 }}>
+            <Slider
+              range
+              min={PRICE_MIN}
+              max={PRICE_MAX}
+              value={priceRange}
+              onChange={setPriceRange}
+              allowCross={false}
+              trackStyle={[{ backgroundColor: "#f47b9b" }]}
+              handleStyle={[
+                { borderColor: "#f47b9b", backgroundColor: "#fff" },
+                { borderColor: "#f47b9b", backgroundColor: "#fff" },
+              ]}
+            />
+          </div>
+          <div style={{ marginBottom: 12 }}>
+            <span>{priceRange[0]}€</span> — <span>{priceRange[1]}€</span>
+          </div>
+          <button onClick={() => setPriceRange([PRICE_MIN, PRICE_MAX])} style={{ padding: "4px 12px", borderRadius: 6, border: "none", background: "#eabfa2", color: "#3a3937", cursor: "pointer" }}>
+            Réinitialiser
+          </button>
         </aside>
 
         <section className="shop-products-section">
           <h2>Nos créations disponibles</h2>
           <div className="shop-products-grid">
-            {filteredProducts.length === 0 && (
+            {filteredProductsByPrice.length === 0 && (
               <div className="shop-loading">Aucun produit trouvé.</div>
             )}
-            {filteredProducts.map((product) => (
+            {filteredProductsByPrice.map((product) => (
               <div key={product.id} className="shop-product-card">
                 {product.promo && (
                   <div className="shop-product-promo">EN PROMO !</div>
