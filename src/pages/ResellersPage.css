@@ -1,0 +1,41 @@
+.resellers-container {
+  max-width: 900px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  font-family: 'Inter', sans-serif;
+}
+
+.resellers-container h1 {
+  text-align: center;
+  font-size: 2rem;
+  margin-bottom: 1rem;
+}
+
+.reseller-item {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-start;
+  margin-bottom: 2rem;
+  gap: 1rem;
+}
+
+.reseller-image {
+  width: 300px;
+  border-radius: 8px;
+  object-fit: cover;
+}
+
+.reseller-info {
+  flex: 1;
+  min-width: 250px;
+}
+
+.reseller-info h2 {
+  margin-top: 0;
+}
+
+.reseller-info .address {
+  color: #f5728f;
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}

@@ -1,0 +1,61 @@
+.legal-container {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  font-family: 'Inter', sans-serif;
+  color: #2c2c2c;
+  line-height: 1.8;
+}
+
+.legal-container h1 {
+  font-size: 1.8rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 2rem;
+}
+
+.legal-container h2 {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-top: 2rem;
+  margin-bottom: 0.8rem;
+  color: #2c2c2c;
+}
+
+.legal-container p {
+  margin-bottom: 1rem;
+  font-size: 1rem;
+}
+
+.legal-container ul {
+  padding-left: 1.2rem;
+  margin-bottom: 1.2rem;
+}
+
+.legal-container li {
+  margin-bottom: 0.6rem;
+}
+
+.legal-container strong {
+  font-weight: 600;
+}
+
+.legal-container a {
+  color: #2c2c2c;
+  text-decoration: none;
+}
+
+.legal-container a:hover {
+  text-decoration: underline;
+}
+
+.highlight-pink {
+  color: #f5728f; /* rose doux */
+}
+
+
+@media (max-width: 600px) {
+  .legal-container {
+    padding: 0 1rem;
+  }
+}

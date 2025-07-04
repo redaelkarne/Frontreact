@@ -1,0 +1,63 @@
+.cgv-container {
+  max-width: 800px;
+  margin: 3rem auto;
+  padding: 0 1rem;
+  font-family: 'Inter', sans-serif;
+  color: #2c2c2c;
+  line-height: 1.9; 
+}
+
+.cgv-container h1 {
+  font-size: 2rem;
+  font-weight: 600;
+  text-align: center;
+  margin-bottom: 2rem; 
+  color: #2c2c2c;
+}
+
+.cgv-container h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: #f4a384;
+  margin-top: 2rem; 
+  margin-bottom: 1rem; 
+}
+
+.cgv-container h3 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #f4a384;
+  margin-top: 1.5rem;
+  margin-bottom: 0.8rem;
+  padding-left: 1rem; 
+}
+
+
+.cgv-container p {
+  margin-bottom: 1.2rem; 
+  font-size: 1rem;
+}
+
+.cgv-container ul {
+  padding-left: 1.8rem; 
+  margin-bottom: 1.5rem; 
+}
+
+.cgv-container li {
+  margin-bottom: 0.7rem; 
+}
+
+.cgv-container strong {
+  font-weight: 600;
+}
+
+.cgv-container a {
+  color: #2c2c2c;
+  text-decoration: underline;
+}
+
+@media (max-width: 600px) {
+  .cgv-container {
+    padding: 0 1rem;
+  }
+}

@@ -2,7 +2,11 @@ import React, { useEffect } from 'react';
 import { HashRouter as Router, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
 import AdminPage from './pages/AdminPage';
+import PrivacyPolicyPage from './pages/PrivacyPolicyPage';
 import ShopPage from './pages/ShopPage';
+import DeliveryPage from './pages/DeliveryPage';
+import ResellersPage from './pages/ResellersPage';
+import FaqPage from './pages/FaqPage';
 import BlogPage from './pages/BlogPage'; // Import du composant BlogPage
 import LoginPage from './pages/LoginPage';
 import ProfilePage from './pages/ProfilePage'; // Import du composant ProfilePage
@@ -12,6 +16,10 @@ import Navbar from './components/Navbar'; // Import du composant Navbar
 import Footer from './components/Footer'; // Import du composant Footer
 import CreationsPage from './pages/CreationsPage'; // Import corrigé du composant CreationsPage
 import Contact from './pages/Contact'; // Import du composant Contact
+import CgvPage from './pages/CgvPage';
+import LegalNoticePage from './pages/LegalNoticePage';
+
+
 
 // Fonction pour récupérer les informations utilisateur depuis l'API avec le rôle
 const fetchUserRole = async () => {
@@ -125,8 +133,14 @@ export default function App() {
           <Route path="/shop" element={<ShopPage />} />
           <Route path="/blog" element={<BlogPage />} /> {/* Route pour la page de blog */}
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/politique-confidentialite" element={<PrivacyPolicyPage />} /> {/* Politique de confidentialité */}
+          <Route path="/mentions-legales" element={<LegalNoticePage />} />
           <Route path="/creations" element={<CreationsPage />} /> {/* Route corrigée pour la page Créations */}
           <Route path="/contact" element={<Contact />} /> {/* Route pour la page Contact */}
+          <Route path="/cgv" element={<CgvPage />} /> {/* Route pour la page CGV */}
+          <Route path="/livraison" element={<DeliveryPage />} />
+          <Route path="/resellers" element={<ResellersPage />} />
+          <Route path="/faq" element={<FaqPage />} />
           <Route path="/profile" element={<ProfilePage />} /> {/* Route pour la page Profil */}
           <Route path="/orders" element={<OrdersPage />} /> {/* Route pour la page Commandes */}
           <Route

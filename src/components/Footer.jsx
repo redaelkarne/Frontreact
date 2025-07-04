@@ -1,5 +1,7 @@
 import React from 'react';
 import './Footer.css';
+import { Link } from 'react-router-dom';
+
 
 const Footer = () => {
   return (
@@ -8,10 +10,25 @@ const Footer = () => {
         <div className="footer-help">
           <h3>Besoin d'aide ?</h3>
           <ul>
-            <li>Points de vente physiques</li>
-            <li>Livraison</li>
-            <li>Foire aux questions</li>
-            <li>Me contacter</li>
+            <li>
+            <Link to="/resellers" style={{ textDecoration: 'none', color: 'inherit' }}>
+              Points de vente physiques
+            </Link>
+            </li>
+            <li>
+              <Link to="/livraison" style={{ textDecoration: 'none', color: 'inherit' }}>
+                Livraison
+              </Link>
+            </li>
+            <li>
+              <Link to="/faq" style={{ textDecoration: 'none', color: 'inherit' }}>Foire aux questions</Link>
+            </li>
+
+            <li>
+              <Link to="/contact" style={{ textDecoration: 'none', color: 'inherit' }}>
+                Me contacter
+              </Link>
+            </li>
           </ul>
         </div>
         <div className="footer-logo">
@@ -37,9 +54,18 @@ const Footer = () => {
         <div className="footer-links">
           <h3>Liens utiles</h3>
           <ul>
-            <li>CGV</li>
-            <li>Mentions légales</li>
-            <li>Politique de confidentialité</li>
+            <li>
+              <Link to="/cgv" style={{ textDecoration: 'none', color: 'inherit' }}>CGV</Link>
+            </li>
+
+            <li>
+              <Link to="/mentions-legales" style={{ textDecoration: 'none', color: 'inherit' }}>Mentions légales</Link>
+            </li>
+
+            <li>
+              <Link to="/politique-confidentialite" style={{ textDecoration: 'none', color: 'inherit' }}>Politique de confidentialité</Link>
+            </li>
+
           </ul>
         </div>
       </div>

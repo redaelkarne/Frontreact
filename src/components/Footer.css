@@ -198,4 +198,17 @@
     margin-top: 20px;
     padding-top: 16px;
   }
+
+  .footer-link {
+  color: #ccc;
+  text-decoration: none;
+  transition: color 0.2s;
+  display: inline-block;
+  margin-bottom: 8px; /* même espacement que les autres */
+}
+
+.footer-link:hover {
+  color: #ff6b9d;
+}
+
 }
