@@ -353,10 +353,10 @@ const LandingPage = () => {
           </div>
           <div className="about-right">
             <div className="about-img-main">
-              <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80" alt="Créations" />
+              <img src="https://audelweiss.fr/wp-content/uploads/2025/02/bandeaux.jpg.webp" alt="Créations" />
             </div>
             <div className="about-img-portrait">
-              <img src="https://images.unsplash.com/photo-1517841905240-472988babdf9?auto=format&fit=crop&w=400&q=80" alt="Portrait créatrice" />
+              <img src="https://audelweiss.fr/wp-content/uploads/2025/02/4b016c7372b5440180c5e265eed458d1-scaled.webp" alt="Portrait créatrice" />
             </div>
           </div>
         </div>

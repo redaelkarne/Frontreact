@@ -1,8 +1,8 @@
 /* Navbar moderne et élégante */
 .modern-navbar {
-  position: sticky;
+  position: sticky !important;
   top: 0;
-  z-index: 1000;
+  z-index: 2000 !important;
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   border-bottom: 1px solid rgba(255, 107, 157, 0.1);
