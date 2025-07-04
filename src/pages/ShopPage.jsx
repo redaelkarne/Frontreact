@@ -4,6 +4,8 @@ import { useNavigate } from "react-router-dom";
 import { FaTrash } from "react-icons/fa";
 import Slider from "rc-slider";
 import "rc-slider/assets/index.css";
+import ReferralWidget from "../components/ReferralWidget";
+import referralService from "../services/referralService"; // Importer le service
 
 // Fonction pour récupérer les produits depuis Strapi
 const fetchProducts = async () => {
@@ -61,6 +63,14 @@ const ShopPage = () => {
   const [isProcessingPayment, setIsProcessingPayment] = useState(false);
   const [userEmail, setUserEmail] = useState('');
   const [priceRange, setPriceRange] = useState([PRICE_MIN, PRICE_MAX]);
+  const [paymentCart, setPaymentCart] = useState([]);
+  const [paymentDeliveryInfo, setPaymentDeliveryInfo] = useState(null);
+  
+  // Nouveaux états pour les récompenses de parrainage
+  const [referralRewards, setReferralRewards] = useState(0);
+  const [appliedDiscount, setAppliedDiscount] = useState(0);
+  const [showReferralDiscount, setShowReferralDiscount] = useState(false);
+  
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -70,6 +80,7 @@ const ShopPage = () => {
     // Récupérer l'email de l'utilisateur connecté
     if (jwt) {
       fetchUserEmail();
+      fetchReferralRewards(); // Récupérer les récompenses disponibles
     }
 
     const loadProducts = async () => {
@@ -101,6 +112,29 @@ const ShopPage = () => {
       }
     } catch (err) {
       console.error('Erreur lors de la récupération de l\'email utilisateur:', err);
+    }
+  };
+
+  const fetchReferralRewards = async () => {
+    console.log('💰 ShopPage: Récupération des récompenses de parrainage');
+    try {
+      const jwt = localStorage.getItem('jwt');
+      if (!jwt) return;
+
+      const response = await fetch('http://localhost:1337/api/referrals/stats', {
+        method: 'GET',
+        headers: {
+          'Authorization': `Bearer ${jwt}`
+        }
+      });
+
+      if (response.ok) {
+        const data = await response.json();
+        console.log('💰 ShopPage: Récompenses récupérées:', data.referralRewards);
+        setReferralRewards(data.referralRewards || 0);
+      }
+    } catch (err) {
+      console.error('❌ ShopPage: Erreur récupération récompenses:', err);
     }
   };
 
@@ -138,55 +172,190 @@ const ShopPage = () => {
     setDeliveryInfo((prev) => ({ ...prev, [name]: value }));
   }
 
+  const handleApplyReferralDiscount = () => {
+    console.log('💰 ShopPage: Application de la réduction parrainage');
+    const cartTotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const maxDiscount = Math.min(referralRewards, cartTotal);
+    
+    setAppliedDiscount(maxDiscount);
+    setShowReferralDiscount(false);
+    console.log(`💰 ShopPage: Réduction appliquée: ${maxDiscount}€`);
+  };
+
+  const handleRemoveReferralDiscount = () => {
+    console.log('💰 ShopPage: Suppression de la réduction parrainage');
+    setAppliedDiscount(0);
+  };
+
+  const getCartTotal = () => {
+    const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    return Math.max(0, subtotal - appliedDiscount);
+  };
+
+  const getSubtotal = () => {
+    return cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  };
+
   const sendOrderToStrapi = async (orderData) => {
+    console.log('📦 ShopPage: === DÉBUT DEBUG COMMANDE ===');
+    console.log('📦 ShopPage: Envoi commande à Strapi:', orderData);
+    console.log('📦 ShopPage: Type de chaque champ:');
+    Object.keys(orderData).forEach(key => {
+      console.log(`   ${key}: ${typeof orderData[key]} = "${orderData[key]}"`);
+    });
+    
     try {
+      const requestBody = { data: orderData };
+      console.log('📦 ShopPage: Corps de la requête final:', requestBody);
+      
+      // Vérifier si JSON.stringify fonctionne
+      let jsonString;
+      try {
+        jsonString = JSON.stringify(requestBody);
+        console.log('📦 ShopPage: JSON stringifié avec succès, longueur:', jsonString.length);
+        console.log('📦 ShopPage: Extrait JSON (premiers 500 chars):', jsonString.substring(0, 500));
+      } catch (jsonError) {
+        console.error('❌ ShopPage: Erreur JSON.stringify:', jsonError);
+        return null;
+      }
+
+      console.log('📦 ShopPage: Envoi de la requête à http://localhost:1337/api/commandes');
       const response = await fetch('http://localhost:1337/api/commandes', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ data: orderData }),
+        body: jsonString,
       });
 
-      if (!response.ok) {
-        throw new Error(`Erreur ${response.status}`);
+      console.log('📦 ShopPage: Statut réponse:', response.status);
+      console.log('📦 ShopPage: Status text:', response.statusText);
+      console.log('📦 ShopPage: Headers de réponse:');
+      response.headers.forEach((value, key) => {
+        console.log(`   ${key}: ${value}`);
+      });
+
+      // Lire la réponse comme text d'abord
+      const responseText = await response.text();
+      console.log('📦 ShopPage: Réponse brute (text):', responseText);
+
+      // Essayer de parser en JSON
+      let responseData;
+      try {
+        responseData = JSON.parse(responseText);
+        console.log('📦 ShopPage: Données de réponse parsées:', responseData);
+      } catch (parseError) {
+        console.error('❌ ShopPage: Impossible de parser la réponse JSON:', parseError);
+        console.log('📦 ShopPage: Réponse brute était:', responseText);
+        return null;
       }
 
-      return await response.json();
+      if (!response.ok) {
+        console.log('❌ ShopPage: === DÉTAILS COMPLETS DE L\'ERREUR ===');
+        console.log('❌ ShopPage: Response status:', response.status);
+        console.log('❌ ShopPage: Response data:', responseData);
+        
+        if (responseData.error) {
+          console.log('❌ ShopPage: error.message:', responseData.error.message);
+          console.log('❌ ShopPage: error.details:', responseData.error.details);
+          console.log('❌ ShopPage: error.name:', responseData.error.name);
+          
+          if (responseData.error.details && Array.isArray(responseData.error.details.errors)) {
+            console.log('❌ ShopPage: Détails des erreurs de validation:');
+            responseData.error.details.errors.forEach((err, index) => {
+              console.log(`   Erreur ${index + 1}:`, err);
+              console.log(`     - path: ${err.path}`);
+              console.log(`     - message: ${err.message}`);
+              console.log(`     - name: ${err.name}`);
+            });
+          }
+        }
+        
+        // Améliorer l'affichage de l'erreur
+        let errorMessage = 'Erreur inconnue';
+        if (responseData.error) {
+          if (responseData.error.details && responseData.error.details.errors) {
+            errorMessage = responseData.error.details.errors.map(err => 
+              `${err.path}: ${err.message}`
+            ).join(', ');
+          } else if (responseData.error.message) {
+            errorMessage = responseData.error.message;
+          }
+        }
+        
+        console.error('❌ ShopPage: Message d\'erreur final:', errorMessage);
+        throw new Error(`Erreur ${response.status}: ${errorMessage}`);
+      }
+
+      console.log('✅ ShopPage: Commande envoyée avec succès');
+      return responseData;
     } catch (err) {
-      console.error('Erreur lors de l\'enregistrement de la commande:', err);
+      console.error('❌ ShopPage: === ERREUR GÉNÉRALE ===');
+      console.error('❌ ShopPage: Type d\'erreur:', err.constructor.name);
+      console.error('❌ ShopPage: Message:', err.message);
+      console.error('❌ ShopPage: Stack:', err.stack);
       return null;
     }
   };
 
   function handleCheckout() {
+    console.log('🛒 ShopPage: === DÉBUT CHECKOUT ===');
+    console.log('🛒 ShopPage: Vérification des informations de livraison...');
+    console.log('🛒 ShopPage: deliveryInfo:', deliveryInfo);
+    console.log('🛒 ShopPage: isLoggedIn:', isLoggedIn);
+    console.log('🛒 ShopPage: userEmail:', userEmail);
+    
     if (!deliveryInfo.name || !deliveryInfo.address || !deliveryInfo.phone || (!isLoggedIn && !deliveryInfo.email)) {
+      console.log('❌ ShopPage: Informations manquantes');
       showNotification("Veuillez remplir toutes les informations de livraison" + (!isLoggedIn ? " et votre adresse e-mail." : "."));
       return;
     }
 
+    const subtotal = getSubtotal();
+    const finalTotal = getCartTotal();
+    
+    console.log('🛒 ShopPage: Calculs:');
+    console.log('   - Sous-total:', subtotal);
+    console.log('   - Réduction appliquée:', appliedDiscount);
+    console.log('   - Total final:', finalTotal);
+    console.log('🛒 ShopPage: Panier:', cart);
+
+    // Structure corrigée avec la bonne valeur pour Statut (avec l'espace)
     const orderData = {
       name: deliveryInfo.name.trim(),
-      address: deliveryInfo.address.trim(),
+      email: isLoggedIn ? userEmail : deliveryInfo.email.trim(),
       phone: deliveryInfo.phone.trim(),
-      email: isLoggedIn ? userEmail : deliveryInfo.email.trim(), // Utiliser l'email de l'utilisateur connecté
-      items: cart.map((item) => ({
-        productId: item.id,
+      address: deliveryInfo.address.trim(),
+      items: JSON.stringify(cart.map((item) => ({
+        id: item.id,
         name: item.name,
         quantity: item.quantity,
-        price: parseFloat(item.price)
-      })),
-      total: parseFloat(cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2))
+        price: item.price
+      }))),
+      total: finalTotal.toFixed(2),
+      ...(appliedDiscount > 0 && { discount: appliedDiscount.toFixed(2) }),
+      Statut: 'En Livraison '  // Ajouter l'espace à la fin comme requis par Strapi
     };
 
+    console.log('🛒 ShopPage: Données finales pour Strapi (avec Statut: "En cours "):', orderData);
+    console.log('🛒 ShopPage: === ENVOI À STRAPI ===');
+
     sendOrderToStrapi(orderData).then((result) => {
+      console.log('🛒 ShopPage: Résultat de sendOrderToStrapi:', result);
       if (result) {
+        console.log('✅ ShopPage: Commande enregistrée avec succès:', result);
         setIsCartOpen(false);
         setIsPaymentOpen(true);
+        setPaymentCart(cart);
+        setPaymentDeliveryInfo(deliveryInfo);
         showNotification("Commande enregistrée avec succès !");
       } else {
-        showNotification('Une erreur est survenue lors de l\'enregistrement de la commande.');
+        console.error('❌ ShopPage: Échec enregistrement commande');
+        showNotification('Une erreur est survenue lors de l\'enregistrement de la commande. Veuillez réessayer.');
       }
+    }).catch((error) => {
+      console.error('❌ ShopPage: Erreur Promise:', error);
+      showNotification('Erreur de connexion. Veuillez vérifier votre connexion internet.');
     });
   }
 
@@ -373,13 +542,19 @@ const ShopPage = () => {
   const handlePaymentClick = async () => {
     setIsProcessingPayment(true);
     try {
-      const amount = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+      const amount = getCartTotal();
       const result = await simulatePayment(amount);
       
       if (result && result.status === 'succeeded') {
+        // Si une réduction de parrainage a été appliquée, la déduire du solde
+        if (appliedDiscount > 0) {
+          await deductReferralRewards(appliedDiscount);
+        }
+        
         setIsPaymentOpen(false);
         setCart([]);
         setDeliveryInfo({ name: "", address: "", phone: "", email: "" });
+        setAppliedDiscount(0);
         showNotification(`Paiement réussi avec la carte ${result.card} ! Merci pour votre commande.`);
       }
     } catch (error) {
@@ -388,6 +563,26 @@ const ShopPage = () => {
       }
     } finally {
       setIsProcessingPayment(false);
+    }
+  };
+
+  const deductReferralRewards = async (amount) => {
+    console.log('💰 ShopPage: Déduction des récompenses utilisées:', amount);
+    try {
+      // Utiliser le service au lieu de l'appel direct
+      const result = await referralService.useRewards(amount);
+      console.log('✅ ShopPage: Récompenses déduites avec succès:', result);
+      
+      // Mettre à jour le solde local avec la réponse du serveur
+      setReferralRewards(result.remainingRewards || 0);
+      
+      // Optionnel: Rafraîchir les stats du widget
+      if (window.refreshReferralWidget) {
+        window.refreshReferralWidget();
+      }
+    } catch (err) {
+      console.error('❌ ShopPage: Erreur déduction récompenses:', err);
+      showNotification('Erreur lors de la déduction des récompenses');
     }
   };
 
@@ -401,6 +596,13 @@ const ShopPage = () => {
       </header>
       
       {notif && <div className="shop-notif">{notif}</div>}
+      
+      {/* Widget de parrainage - Toujours en bas à gauche */}
+      {isLoggedIn && (
+        <div className="referral-widget-fixed">
+          <ReferralWidget />
+        </div>
+      )}
       
       <main className="shop-main main-container">
         <aside className="shop-sidebar">
@@ -556,6 +758,69 @@ const ShopPage = () => {
                       </li>
                     ))}
                   </ul>
+
+                  {/* Section des récompenses de parrainage */}
+                  {isLoggedIn && referralRewards > 0 && (
+                    <div className="referral-rewards-section">
+                      <h4>💰 Récompenses de Parrainage Disponibles</h4>
+                      <div className="referral-rewards-info">
+                        <span>Solde disponible: <strong>{referralRewards.toFixed(2)}€</strong></span>
+                        {!showReferralDiscount ? (
+                          <button 
+                            className="apply-rewards-btn"
+                            onClick={() => setShowReferralDiscount(true)}
+                          >
+                            🎯 Utiliser mes récompenses
+                          </button>
+                        ) : (
+                          <div className="apply-rewards-form">
+                            <p>Montant maximum utilisable: <strong>{Math.min(referralRewards, getSubtotal()).toFixed(2)}€</strong></p>
+                            <div className="rewards-buttons">
+                              <button 
+                                className="confirm-rewards-btn"
+                                onClick={handleApplyReferralDiscount}
+                              >
+                                ✅ Appliquer
+                              </button>
+                              <button 
+                                className="cancel-rewards-btn"
+                                onClick={() => setShowReferralDiscount(false)}
+                              >
+                                ❌ Annuler
+                              </button>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Récapitulatif des prix */}
+                  <div className="cart-summary">
+                    <div className="summary-line">
+                      <span>Sous-total:</span>
+                      <span>{getSubtotal().toFixed(2)}€</span>
+                    </div>
+                    {appliedDiscount > 0 && (
+                      <div className="summary-line discount-line">
+                        <span>
+                          🎯 Réduction parrainage
+                          <button 
+                            className="remove-discount-btn"
+                            onClick={handleRemoveReferralDiscount}
+                          >
+                            ❌
+                          </button>
+                        </span>
+                        <span>-{appliedDiscount.toFixed(2)}€</span>
+                      </div>
+                    )}
+                    <div className="summary-line total-line">
+                      <span><strong>Total:</strong></span>
+                      <span><strong>{getCartTotal().toFixed(2)}€</strong></span>
+                    </div>
+                  </div>
+
                   <div className="shop-delivery-form">
                     <h3>Informations de livraison</h3>
                     <input
@@ -632,6 +897,24 @@ const ShopPage = () => {
                 </ul>
               </div>
 
+              {/* Récapitulatif des prix avec réduction */}
+              <div style={{ marginBottom: "20px", padding: "12px", background: "#f9f9f9", borderRadius: "8px" }}>
+                <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px" }}>
+                  <span>Sous-total:</span>
+                  <span>{getSubtotal().toFixed(2)}€</span>
+                </div>
+                {appliedDiscount > 0 && (
+                  <div style={{ display: "flex", justifyContent: "space-between", marginBottom: "8px", color: "#28a745" }}>
+                    <span>🎯 Réduction parrainage:</span>
+                    <span>-{appliedDiscount.toFixed(2)}€</span>
+                  </div>
+                )}
+                <div style={{ display: "flex", justifyContent: "space-between", fontSize: "1.2rem", fontWeight: "bold", borderTop: "1px solid #ddd", paddingTop: "8px" }}>
+                  <span>Total:</span>
+                  <span>{getCartTotal().toFixed(2)}€</span>
+                </div>
+              </div>
+
               <div style={{ marginBottom: "20px", padding: "12px", background: "#f9f9f9", borderRadius: "8px" }}>
                 <h4>Livraison :</h4>
                 <p><strong>Nom :</strong> {deliveryInfo.name}</p>
@@ -640,16 +923,12 @@ const ShopPage = () => {
                 {deliveryInfo.email && <p><strong>Email :</strong> {deliveryInfo.email}</p>}
               </div>
 
-              <div style={{ marginBottom: "20px", fontSize: "1.2rem", fontWeight: "bold", textAlign: "center" }}>
-                Total : {cart.reduce((sum, item) => sum + item.price * item.quantity, 0).toFixed(2)}€
-              </div>
-
               <button 
                 className="shop-checkout-btn" 
                 onClick={handlePaymentClick}
                 disabled={isProcessingPayment}
               >
-                {isProcessingPayment ? "Traitement..." : "Procéder au paiement"}
+                {isProcessingPayment ? "Traitement..." : `Payer ${getCartTotal().toFixed(2)}€`}
               </button>
             </div>
           </div>
@@ -688,10 +967,10 @@ const ShopPage = () => {
           </div>
         )}
       </main>
-
-     
     </div>
   );
-}
+};
+
+
 
 export default ShopPage;
