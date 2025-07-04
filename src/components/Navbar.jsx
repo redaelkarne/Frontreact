@@ -99,35 +99,35 @@ export default function Navbar() {
             className={isActive('/') ? 'active' : ''}
             onClick={closeMobileMenu}
           >
-            🏠 Accueil
+            Accueil
           </Link>
           <Link 
             to="/shop" 
             className={`special ${isActive('/shop') ? 'active' : ''}`}
             onClick={closeMobileMenu}
           >
-            🛍️ Boutique
+            Boutique
           </Link>
           <Link 
             to="/blog" 
             className={isActive('/blog') ? 'active' : ''}
             onClick={closeMobileMenu}
           >
-            📝 Blog
+            Blog
           </Link>
           <Link 
             to="/contact" 
             className={isActive('/contact') ? 'active' : ''}
             onClick={closeMobileMenu}
           >
-            📞 Contact
+            Contact
           </Link>
           <Link 
             to="/creations" 
             className={isActive('/creations') ? 'active' : ''}
             onClick={closeMobileMenu}
           >
-            🎨 Créations
+            Créations
           </Link>
           
           {isAdmin && (
@@ -136,7 +136,7 @@ export default function Navbar() {
               className={`special ${isActive('/admin') ? 'active' : ''}`}
               onClick={closeMobileMenu}
             >
-              ⚙️ Admin
+              Admin
             </Link>
           )}
         </div>
