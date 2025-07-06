@@ -129,6 +129,13 @@ export default function Navbar() {
           >
             Créations
           </Link>
+          <Link 
+            to="/apropos" 
+            className={isActive('/apropos') ? 'active' : ''}
+            onClick={closeMobileMenu}
+          >
+            À propos
+          </Link>
           
           {isAdmin && (
             <Link 

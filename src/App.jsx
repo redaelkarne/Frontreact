@@ -18,6 +18,7 @@ import CreationsPage from './pages/CreationsPage'; // Import corrigé du composa
 import Contact from './pages/Contact'; // Import du composant Contact
 import CgvPage from './pages/CgvPage';
 import LegalNoticePage from './pages/LegalNoticePage';
+import AboutPage from './pages/AboutPage';
 
 
 
@@ -143,6 +144,7 @@ export default function App() {
           <Route path="/faq" element={<FaqPage />} />
           <Route path="/profile" element={<ProfilePage />} /> {/* Route pour la page Profil */}
           <Route path="/orders" element={<OrdersPage />} /> {/* Route pour la page Commandes */}
+          <Route path="/apropos" element={<AboutPage />} />
           <Route
             path="/admin"
             element={
