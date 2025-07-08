@@ -718,7 +718,7 @@ const ShopPage = () => {
         {/* Modal Panier */}
         {isCartOpen && (
           <div className="shop-cart-modal">
-            <div className="shop-cart-modal-content">
+            <div className="shop-cart-modal-content" style={{ maxHeight: '75vh', overflowY: 'auto' }}>
               <button
                 className="shop-cart-close-btn"
                 onClick={() => setIsCartOpen(false)}
@@ -875,7 +875,7 @@ const ShopPage = () => {
         {/* Modal Paiement */}
         {isPaymentOpen && (
           <div className="shop-cart-modal">
-            <div className="shop-cart-modal-content">
+            <div className="shop-cart-modal-content" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
               <button
                 className="shop-cart-close-btn"
                 onClick={() => setIsPaymentOpen(false)}
@@ -937,7 +937,7 @@ const ShopPage = () => {
         {/* Modal Invité */}
         {isGuestModalOpen && (
           <div className="shop-cart-modal">
-            <div className="shop-cart-modal-content">
+            <div className="shop-cart-modal-content" style={{ maxHeight: '90vh', overflowY: 'auto' }}>
               <button
                 className="shop-cart-close-btn"
                 onClick={() => setIsGuestModalOpen(false)}

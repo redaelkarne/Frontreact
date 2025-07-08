@@ -428,14 +428,31 @@ const AdminPage = () => {
                   ],
                 }}
                 options={{
+                  responsive: true,
+                  maintainAspectRatio: true,
+                  aspectRatio: 2,
                   plugins: {
                     legend: { display: true, labels: { color: "#2c2c2c" } },
                   },
                   scales: {
-                    x: { ticks: { color: "#2c2c2c" } },
-                    y: { ticks: { color: "#2c2c2c" } },
+                    x: { 
+                      ticks: { color: "#2c2c2c" },
+                      grid: { display: true }
+                    },
+                    y: { 
+                      ticks: { color: "#2c2c2c" },
+                      grid: { display: true },
+                      beginAtZero: true
+                    },
                   },
+                  layout: {
+                    padding: {
+                      top: 10,
+                      bottom: 10
+                    }
+                  }
                 }}
+                height={300}
               />
             </div>
 

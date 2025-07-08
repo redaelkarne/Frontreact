@@ -18,6 +18,8 @@ const fetchCreations = async () => {
         id: item.id,
         titre: item.Titre || "",
         descriptions: item.description || "",
+        longDescription: item.LongDescription || "",
+        time: item.Temps || "",
         img: item.img?.url
           ? `http://localhost:1337${item.img.url}`
           : null,
@@ -33,6 +35,8 @@ export default function CreationsPage() {
   const [creations, setCreations] = useState([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");
+  const [selectedCreation, setSelectedCreation] = useState(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   useEffect(() => {
     const loadCreations = async () => {
@@ -53,6 +57,16 @@ export default function CreationsPage() {
     return titre.toLowerCase().includes(searchTerm) ||
            descriptions.toLowerCase().includes(searchTerm);
   });
+
+  const openModal = (creation) => {
+    setSelectedCreation(creation);
+    setIsModalOpen(true);
+  };
+
+  const closeModal = () => {
+    setIsModalOpen(false);
+    setSelectedCreation(null);
+  };
 
   return (
     <div className="creations-root">
@@ -84,7 +98,11 @@ export default function CreationsPage() {
           ) : (
             <div className="creations-grid">
               {filteredCreations.map((creation) => (
-                <div key={creation.id} className="creation-card">
+                <div 
+                  key={creation.id} 
+                  className="creation-card"
+                  onClick={() => openModal(creation)}
+                >
                   <div className="creation-img-wrap">
                     {creation.img ? (
                       <img src={creation.img} alt={creation.titre} />
@@ -104,6 +122,57 @@ export default function CreationsPage() {
           )}
         </section>
       </main>
+
+      {/* Modal Popup */}
+      {isModalOpen && selectedCreation && (
+        <div className="modal-overlay" onClick={closeModal}>
+          <div className="modal-content" onClick={(e) => e.stopPropagation()}>
+            <button className="modal-close" onClick={closeModal}>
+              ×
+            </button>
+            
+            <div className="modal-header">
+              <h2>{selectedCreation.titre}</h2>
+            </div>
+            
+            <div className="modal-body">
+              <div className="modal-image">
+                {selectedCreation.img ? (
+                  <img src={selectedCreation.img} alt={selectedCreation.titre} />
+                ) : (
+                  <div className="modal-img-placeholder">
+                    <span>🎨</span>
+                  </div>
+                )}
+              </div>
+              
+              <div className="modal-details">
+                <div className="modal-info-section">
+                  <h3>Catégorie(s)</h3>
+                  <p>{selectedCreation.descriptions}</p>
+                </div>
+                
+                {selectedCreation.longDescription && (
+                  <div className="modal-info-section">
+                    <h3>Description détaillée</h3>
+                    <p>{selectedCreation.longDescription}</p>
+                  </div>
+                )}
+                
+                {selectedCreation.time && (
+                  <div className="modal-info-section">
+                    <h3>Temps de création</h3>
+                    <p className="creation-time">
+                      <span className="time-icon">⏱️</span>
+                      {selectedCreation.time}
+                    </p>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       
     </div>

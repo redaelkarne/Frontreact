@@ -316,7 +316,7 @@ const LandingPage = () => {
                   }}
                 />
                 <Link to="/shop">
-                  <button className="product-btn">+ Voir en boutique</button>
+                  <button className="product-btn"> Voir plus en boutique</button>
                 </Link>
                 <div className="product-rating">★★★★★</div>
                 <div className="product-title">{product.name}</div>
