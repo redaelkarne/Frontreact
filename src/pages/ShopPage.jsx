@@ -672,9 +672,7 @@ const ShopPage = () => {
             )}
             {filteredProductsByPrice.map((product) => (
               <div key={product.id} className="shop-product-card">
-                {product.promo && (
-                  <div className="shop-product-promo">EN PROMO !</div>
-                )}
+                
                 <div className="shop-product-img-wrap">
                   <img src={product.img} alt={product.name} />
                 </div>

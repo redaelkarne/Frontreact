@@ -44,7 +44,7 @@ const fetchProducts = async () => {
 // Fonction pour récupérer les articles de blog depuis Strapi
 const fetchBlogArticles = async () => {
   try {
-    const response = await fetch('http://localhost:1337/api/articles?populate=image&sort=createdAt:desc&pagination[limit]=3');
+    const response = await fetch('http://localhost:1337/api/articles?populate=*&sort=createdAt:desc&pagination[limit]=3');
     const data = await response.json();
 
     if (!Array.isArray(data?.data)) {
@@ -54,14 +54,15 @@ const fetchBlogArticles = async () => {
 
     return data.data.map((item) => {
       const attributes = item.attributes || {};
+      
       return {
         id: item.id,
         title: attributes.title || item.title,
         excerpt: attributes.excerpt || item.excerpt,
         category: attributes.category || item.category || "Blog",
         createdAt: attributes.createdAt || item.createdAt,
-        img: attributes.image?.data?.attributes?.url
-          ? `http://localhost:1337${attributes.image.data.attributes.url}`
+        img: item.image && item.image.length > 0 && item.image[0].url
+          ? `http://localhost:1337${item.image[0].url}`
           : null,
       };
     });
@@ -347,7 +348,7 @@ const LandingPage = () => {
             <p>
               Pour moi, <b>chaque création est une aventure qui allie savoir-faire artisanal, inspiration locale et connexion intérieure.</b> C'est cette approche inspirée de la montagne que je souhaite partager à travers mon univers.
             </p>
-            <Link to="/creations" onClick={() => handleNavigation('/creations')}>
+            <Link to="/apropos" onClick={() => handleNavigation('/apropos')}>
               <button className="about-btn">En savoir plus</button>
             </Link>
           </div>
@@ -373,36 +374,18 @@ const LandingPage = () => {
               Chargement des articles...
             </div>
           ) : blogArticles.length === 0 ? (
-            // Articles statiques si pas d'articles dans Strapi
-            <>
-              <Link to="/blog" className="blog-card">
-                <img src="https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80" alt="Blog 1" />
-                <div className="blog-overlay"></div>
-                <div className="blog-label">Événements</div>
-                <div className="blog-title">Mon tout premier marché artisanal : retour sur l'expérience</div>
-                <div className="blog-date"><span className="blog-date-icon">📅</span> 08/06/2025</div>
-              </Link>
-              <Link to="/blog" className="blog-card">
-                <img src="https://images.unsplash.com/photo-1464983953574-0892a716854b?auto=format&fit=crop&w=600&q=80" alt="Blog 2" />
-                <div className="blog-overlay"></div>
-                <div className="blog-label">Matériel</div>
-                <div className="blog-title">Addi King Size vs Sentro 48 : quelle machine choisir pour tes projets créatifs ?</div>
-                <div className="blog-date"><span className="blog-date-icon">📅</span> 04/04/2025</div>
-              </Link>
-              <Link to="/blog" className="blog-card">
-                <img src="https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&w=600&q=80" alt="Blog 3" />
-                <div className="blog-overlay"></div>
-                <div className="blog-label">Infos</div>
-                <div className="blog-title">Quelle laine choisir ? (Guide Complet 2025)</div>
-                <div className="blog-date"><span className="blog-date-icon">📅</span> 12/03/2025</div>
-              </Link>
-            </>
+            <div style={{ textAlign: 'center', padding: '40px', fontSize: '1.2rem', color: '#666' }}>
+              Aucun article de blog disponible
+            </div>
           ) : (
             blogArticles.map((article) => (
               <Link key={article.id} to="/blog" className="blog-card">
                 <img 
                   src={article.img || "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80"} 
                   alt={article.title} 
+                  onError={(e) => {
+                    e.target.src = "https://images.unsplash.com/photo-1519125323398-675f0ddb6308?auto=format&fit=crop&w=600&q=80";
+                  }}
                 />
                 <div className="blog-overlay"></div>
                 <div className="blog-label">{article.category}</div>
